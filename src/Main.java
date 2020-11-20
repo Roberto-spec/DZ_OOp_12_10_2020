@@ -1,8 +1,99 @@
+import java.io.FileReader;
+import java.util.Arrays;
+
 public class Main {
 
+    public static void main(String[] args) {
+        Worker w=new Worker("Vasya",1,20,0,400);
+        Firm g=new Firm(w);
+        Worker2 w2=new Worker2("Petro",2,0,205,40,20);
+        Worker4 w4=new Worker4("Masha",2,0,30,66,20,true,0.035);
+        Worker6 w6=new Worker6("Fedya",1,15,0,60,20,true,0.035,true,29);
+        int[] n=new int[5];
+        n[0]=600;
+        n[1]=500;
+        n[2]=200;
+        n[3]=800;
+        n[4]=100;
+        Worker5 w5 =new Worker5("Liya",3,n,20,false,0,true);
+        g.Add(w2);
+        g.Add(w4);
+        g.Add(w5);
+        g.Add(w6);
+
+        g.show();
+
+    }
 
 }
+class Firm{
+    Worker[] w;
 
+    public Firm(Worker w6) {
+        w=new Worker[1];
+        w[0] = w6;
+
+    }
+    public void Add(Worker w6){
+        w= Arrays.copyOf(w,w.length+1);
+        w[w.length-1] = w6;
+    }
+    public void show(){
+        int type_of_worker;
+        for(int i=0;i<w.length;i++) {
+            type_of_worker=w[i].getType_of();
+            System.out.println("Name: " + w[i].getName());
+            if (w[i].getType_of() == 1) {
+                System.out.println("Vid oplati : stavka");
+            } else if (w[i].getType_of() == 2) {
+                System.out.println("Vid oplati : pochasovaya");
+            } else {
+                System.out.println("Vid oplati : sdelka");
+            }
+            switch (type_of_worker) {
+                case 1: {
+                    System.out.println("ZArplata: " + ((Worker) w[i]).Zp()[0]);
+                    break;
+                }
+                case 2: {
+                    System.out.println("Nalog: " + ((Worker2) w[i]).getNalog());
+                    System.out.println("ZArplata: " + ((Worker2) w[i]).Zp()[0]);
+                    System.out.println("ZArplata -Nalog: " + ((Worker2) w[i]).Zp()[1]);
+                    break;
+                }
+                case 3: {
+                    System.out.println("Nalog: " + ((Worker3) w[i]).getNalog() + "%");
+                    System.out.println("ZArplata: " + ((Worker3) w[i]).Zp()[0]);
+                    System.out.println("ZArplata -Nalog: " + ((Worker3) w[i]).Zp()[1]);
+                    break;
+                }
+                case 4: {
+                    System.out.println("Nalog: " + ((Worker4) w[i]).getNalog());
+                    System.out.println("ZArplata: " + ((Worker4) w[i]).Zp()[0]);
+                    System.out.println("ZArplata -Nalog(defult/tugr:" + ((Worker5) w[i]).getKurs() + "): " + ((Worker4) w[i]).Zp()[1] + " / " + ((Worker4) w[i]).Zp()[2]);
+                    break;
+                }
+                case 5: {
+                    System.out.println("Nalog: " + ((Worker5) w[i]).getNalog());
+                    System.out.println("ZArplata: " + ((Worker5) w[i]).Zp()[0]);
+                    System.out.println("ZArplata -Nalog(defult/tugr:" + ((Worker5) w[i]).getKurs() + "): " + ((Worker5) w[i]).Zp()[1] + " / " + ((Worker5) w[i]).Zp()[2]);
+                    break;
+                }
+                case 6: {
+                    System.out.println("Nalog: " + ((Worker6) w[i]).getNalog());
+                    System.out.println("ZArplata: " + ((Worker6) w[i]).Zp()[0]);
+                    System.out.println("ZArplata -Nalog(defult/tugr:" + ((Worker6) w[i]).getKurs() + "): " + ((Worker6) w[i]).Zp()[1] + " / " + ((Worker6) w[i]).Zp()[2]);
+                    break;
+                }
+                default: {
+                    break;
+                }
+
+
+            }
+        }
+    }
+}
 class Worker{
     String name;
     int days;
@@ -25,7 +116,7 @@ class Worker{
     public Worker(String n, int t,int[] s){
         this.type_of=t;
         this.name=n;
-
+        sum=new int[s.length];
         for(int i=0;i<s.length;i++){
             this.sum[i]=s[i];
         }
@@ -119,23 +210,33 @@ public int[] Zp() {
       int[] zp=new int[2];
       if(getType_of()==1){
           zp[0]=super.Zp()[0];
-          zp[1]=zp[0]*(1-nalog/100);
+          double d=1-(double)nalog/100;
+          zp[1]=(int)((double)zp[0]*d);
           return zp;
       }
       if(getType_of()==2){
           zp[0]=super.Zp()[0];
-          zp[1]=zp[0]*(1-nalog/100);
+          double d=1-(double)nalog/100;
+          zp[1]=(int)((double)zp[0]*d);
           return zp;
       }
       if(getType_of()==3){
           zp[0]=super.Zp()[0];
-          zp[1]=zp[0]*(1-nalog/100);
+          double d=1-(double)nalog/100;
+          zp[1]=(int)((double)zp[0]*d);
           return zp;
       }
       return zp;
 }
 
 
+    public int getNalog() {
+        return nalog;
+    }
+
+    public void setNalog(int nalog) {
+        this.nalog = nalog;
+    }
 }
 
 class Worker3 extends Worker2{
@@ -161,7 +262,8 @@ class Worker3 extends Worker2{
                 return super.Zp();
             }
             zp[0] = super.Zp()[0];
-            zp[1] = zp[0] * (1 - ((nalog+5) / 100));
+            double d=1-(double)(nalog+5)/100;
+            zp[1]=(int)((double)zp[0]*d);
             return zp;
         }
         if(getType_of()==2){
@@ -169,7 +271,8 @@ class Worker3 extends Worker2{
                 return super.Zp();
             }
             zp[0] = super.Zp()[0];
-            zp[1] = zp[0] * (1 - ((nalog+5) / 100));
+            double d=1-(double)(nalog+5)/100;
+            zp[1]=(int)((double)zp[0]*d);
             return zp;
         }
         if(getType_of()==3){
@@ -177,10 +280,19 @@ class Worker3 extends Worker2{
                 return super.Zp();
             }
             zp[0] = super.Zp()[0];
-            zp[1] = zp[0] * (1 - ((nalog+5) / 100));
+            double d=1-(double)(nalog+5)/100;
+            zp[1]=(int)((double)zp[0]*d);
             return zp;
         }
         return zp;
+    }
+
+    public boolean isChilds() {
+        return childs;
+    }
+
+    public void setChilds(boolean childs) {
+        this.childs = childs;
     }
 }
 class Worker4 extends Worker3{
@@ -205,11 +317,14 @@ class Worker4 extends Worker3{
         if(getType_of()==2){
             if(childs){
                 zp[0]=getIn_moment()*getHours();
-                zp[1]=zp[0]*(1-nalog/100);
+                double d=1-(double)(nalog)/100;
+                zp[1]=(int)((double)zp[0]*d);
                 return zp;
             }
             zp[0]=getIn_moment()*getHours();
-            zp[1] = (zp[0] * (1 - ((nalog+5) / 100)))/2;
+            double d=1-(double)(nalog+5)/100;
+            zp[1]=(int)((double)zp[0]*d)/2;
+
             zp[2] = (int)((double)zp[1] *kurs);
             return zp;
         }
@@ -217,6 +332,14 @@ class Worker4 extends Worker3{
             return super.Zp();
         }
         return zp;
+    }
+
+    public double getKurs() {
+        return kurs;
+    }
+
+    public void setKurs(double kurs) {
+        this.kurs = kurs;
     }
 }
 class Worker5 extends Worker4{
@@ -284,6 +407,14 @@ class Worker5 extends Worker4{
         zp[2]=0;
         return zp;
     }
+
+    public boolean isOffshore() {
+        return offshore;
+    }
+
+    public void setOffshore(boolean offshore) {
+        this.offshore = offshore;
+    }
 }
 class Worker6 extends Worker5{
     int  premium;
@@ -328,5 +459,13 @@ class Worker6 extends Worker5{
             return super.Zp();
         }
         return zp;
+    }
+
+    public int getPremium() {
+        return premium;
+    }
+
+    public void setPremium(int premium) {
+        this.premium = premium;
     }
 }
